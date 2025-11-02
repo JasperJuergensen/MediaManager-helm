@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "mediamanager.fullname" . }}
+  {{- with .Values.deploymentAnnotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  labels:
+    {{- include "mediamanager.labels" . | nindent 4 }}
+spec:
+  {{- with .Values.deploymentStrategy }}
+  strategy:
+    {{- toYaml . | trim | nindent 4 }}
+  {{- end }}
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "mediamanager.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "mediamanager.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            {{- with .Values.mediamanager.env }}
+              {{- toYaml . | nindent 12 }}
+            {{- end }}
+            - name: PORT
+              value: {{ .Values.mediamanager.port | quote }}
+            - name: MEDIAMANAGER_AUTH__TOKEN_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "mediamanager.fullname" . }}-secret
+                  key: auth-token-secret
+          volumeMounts:
+            - mountPath: /app/config
+              name: config
+              readonly: true
+            - mountPath: {{ .Values.mediamanager.config.misc.image_directory | default "/data/images" }}
+              name: images
+          ports:
+            - name: http
+              containerPort: {{ .Values.mediamanager.port }}
+              protocol: TCP
+          livenessProbe:
+            {{- toYaml .Values.livenessProbe | nindent 12 }}
+          readinessProbe:
+            {{- toYaml .Values.readinessProbe | nindent 12 }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "mediamanager.fullname" . }}-config
+        - name: images
+          {{- if .Values.persistence.images.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ include "mediamanager.fullname" . }}-images
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
