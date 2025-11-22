@@ -4,24 +4,31 @@ This repository contains a Helm chart to deploy MediaManager (https://github.com
 
 The chart packages the MediaManager application and provides configurable options for image, service, ingress, persistence and optional PostgreSQL dependency (Bitnami chart).
 
-## Quick start
+## Usage
 
-Install the chart with the release name `media-manager` into the `default` namespace:
+[Helm](https://helm.sh) must be installed to use the charts.  Please refer to
+Helm's [documentation](https://helm.sh/docs) to get started.
 
-```bash
-helm install media-manager ./MediaManager
+Once Helm has been set up correctly, add the repo as follows:
+
+```
+helm repo add <alias> https://jasperjuergensen.github.io/mediamanager-helm
 ```
 
-To upgrade an existing release after changing values:
+If you had already added this repo earlier, run `helm repo update` to retrieve
+the latest versions of the packages.  You can then run `helm search repo
+<alias>` to see the charts.
 
-```bash
-helm upgrade media-manager ./MediaManager -f my-values.yaml
+To install the MediaManager chart:
+
+```
+helm install my-<chart-name> <alias>/MediaManager
 ```
 
-To uninstall and remove all resources created by the chart:
+To uninstall the chart:
 
-```bash
-helm uninstall media-manager
+```
+helm uninstall my-<chart-name>
 ```
 
 ## Configuration
