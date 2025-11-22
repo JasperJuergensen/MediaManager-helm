@@ -1,0 +1,19 @@
+apiVersion: v1
+entries:
+  MediaManager:
+  - apiVersion: v2
+    appVersion: 1.9.0
+    created: "2025-11-22T16:22:07.620133749Z"
+    dependencies:
+    - condition: postgresql.enabled
+      name: postgresql
+      repository: oci://registry-1.docker.io/bitnamicharts
+      version: 16.7.26
+    description: A Helm chart for MediaManager
+    digest: 08535b6b41f66c19a3f990f100fb02e7cc8659ddd04befd7fb71700612a16235
+    name: MediaManager
+    type: application
+    urls:
+    - https://github.com/JasperJuergensen/MediaManager-helm/releases/download/MediaManager-0.1.0/MediaManager-0.1.0.tgz
+    version: 0.1.0
+generated: "2025-11-22T16:22:07.62014485Z"
